@@ -1,0 +1,122 @@
+=============================================================================
+                  ENSNACKS FRONTEND - CODE & ARCHITECTURE FLOW
+=============================================================================
+
+This document explains the Next.js 14 (App Router) codebase we just built, 
+what each file does, and how data flows through the application when a user 
+interacts with it.
+
+-----------------------------------------------------------------------------
+1. HIGH-LEVEL ARCHITECTURE (Next.js App Router)
+-----------------------------------------------------------------------------
+Next.js 14 uses a file-system based router inside the `app/` directory.
+- Folders in parenthesis like `(auth)` or `(admin)` are "Route Groups". They 
+  help organize files but DO NOT affect the URL URL (e.g., `app/(auth)/login` 
+  is just `/login` in the browser).
+- `page.jsx` defines the UI for a specific route.
+- `layout.jsx` defines shared UI (like navbars) that wraps the pages inside 
+  that folder and its subfolders.
+
+-----------------------------------------------------------------------------
+2. STEP-BY-STEP USER FLOW (How the files connect)
+-----------------------------------------------------------------------------
+
+STEP A: User visits the root URL (http://localhost:3000/)
+----------------------------------------------------------
+File: `app/page.jsx`
+- This is the root page. Its only job is to immediately execute `redirect('/login')`.
+- The user is instantly sent to the login page.
+
+STEP B: The Application loads the Global Layout
+----------------------------------------------------------
+File: `app/layout.jsx`
+- This wraps every single page in the app.
+- It includes the `<SessionProvider>`, which is required by NextAuth. This 
+  allows any component in the app to use `useSession()` to check who is logged in.
+
+STEP C: Route Protection Check
+----------------------------------------------------------
+File: `middleware.js` (at the root of the project)
+- BEFORE the `/login` page even renders, Next.js runs this middleware.
+- It checks if the user has a valid NextAuth token.
+- If a logged-in Admin tries to visit `/login`, the middleware intercepts it 
+  and forces them to `/admin/dashboard`.
+- If a logged-in Client tries to visit `/login`, it forces them to `/products`.
+- If no one is logged in, it allows the request to proceed to the login page.
+
+STEP D: User sees the Login Page
+----------------------------------------------------------
+File: `app/(auth)/login/page.jsx`
+- Renders the UI with the toggle switch (Admin/Client), Email, and Password.
+- When the user clicks "Login", it triggers `signIn('credentials', { ... })`.
+- This function is provided by NextAuth, and it tells Next.js to start the 
+  authentication sequence.
+
+STEP E: NextAuth Processes the Login
+----------------------------------------------------------
+File: `app/api/auth/[...nextauth]/route.js`
+- NextAuth intercepts the `signIn` request.
+- Inside the `authorize` function, it looks at the `role` the user selected.
+- It makes an Axios POST request to your existing EXPRESS BACKEND 
+  (`http://localhost:5000/api/auth/admin/login` or `.../client/login`).
+- If the Express backend responds with a 200 OK and a JWT token, NextAuth 
+  takes that token and the user data (id, role, company) and stores it securely 
+  inside its own encrypted NextAuth session cookie (`jwt` and `session` callbacks).
+
+STEP F: Successful Login & Redirect
+----------------------------------------------------------
+File: `app/(auth)/login/page.jsx` (continued)
+- The `signIn` function finishes successfully.
+- We grab the Express JWT token from the NextAuth session and save it to 
+  the browser's `localStorage` as `ensnacks_token`. (This is useful for 
+  making direct API calls later).
+- Finally, `router.push()` sends Admins to `/admin/dashboard` and Clients 
+  to `/products`.
+
+STEP G: Viewing the Dashboard / Products
+----------------------------------------------------------
+Files: 
+- `app/(admin)/admin/layout.jsx` 
+- `app/(admin)/admin/dashboard/page.jsx`
+OR
+- `app/(client)/layout.jsx`
+- `app/(client)/products/page.jsx`
+
+- Next.js renders the specific Layout first (which contains the green Navbar 
+  with the "Welcome, Name" text and Logout button).
+- Inside that Layout, it renders the specific Page (Dashboard or Product list).
+- Both files use `useSession()` to display the user's name dynamically.
+
+-----------------------------------------------------------------------------
+3. MAKING FUTURE API CALLS (The Axios Instance)
+-----------------------------------------------------------------------------
+File: `lib/api.js`
+- Whenever you need to fetch data from your Express backend (e.g., getting 
+  products, creating an order), you will import `api` from this file instead 
+  of importing standard `axios`.
+  Example: `import api from '@/lib/api'`
+- Why? Because this file has an "Interceptor".
+- Before every single request leaves the frontend, it automatically grabs the 
+  `ensnacks_token` from `localStorage` and attaches it to the `Authorization: Bearer` 
+  header.
+- If the Express backend ever responds with a 401 Unauthorized (meaning the 
+  token expired), the interceptor automatically deletes the token from local storage.
+
+-----------------------------------------------------------------------------
+4. SIGNUP FLOW (Admin & Client)
+-----------------------------------------------------------------------------
+Files: `app/(auth)/admin-signup/page.jsx` & `app/(auth)/client-signup/page.jsx`
+- Unlike login, signup bypasses NextAuth completely.
+- When the user fills out the form, we use our custom `lib/api.js` to send a 
+  direct POST request to the Express backend (`/api/auth/.../signup`).
+- If Express returns success, we show a green success message and redirect 
+  the user to the `/login` page after 2 seconds.
+
+=============================================================================
+SUMMARY
+=============================================================================
+1. React/Next.js UI (`/login`)
+2. NextAuth config (`[...nextauth]/route.js`) communicates with Express Backend.
+3. Middleware (`middleware.js`) protects private routes from unauthorized users.
+4. Axios Interceptor (`lib/api.js`) handles attaching the token to future requests.
+5. Layouts wrap specific sections of the site to provide consistent Navbars.
