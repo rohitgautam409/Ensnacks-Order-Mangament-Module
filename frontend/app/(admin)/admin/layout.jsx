@@ -6,6 +6,7 @@
 'use client'
 import { useEffect, useState } from "react"
 import { useRouter } from 'next/navigation'
+import Sidebar from "@/components/sidebar";
 
 export default function AdminLayout({ children }) {
 
@@ -39,25 +40,8 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <nav className="h-14 bg-[#1A3A25] flex items-center justify-between px-6 shadow-md">
-        <div className="text-white font-bold text-lg">
-          🥜 Ensnacks Admin
-        </div>
-
-        <div className="flex items-center space-x-4">
-          <span className="text-white text-sm">
-            Hi, {user?.name || 'Admin'}
-          </span>
-          <button
-            onClick={handleLogout}
-            className="border border-white text-white hover:bg-white hover:text-[#1A3A25] px-4 py-1 rounded-lg text-sm transition"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
+    <div className="min-h-screen flex bg-[#F6F8F6]">
+      <Sidebar />
       <main className="p-6 flex-1">
         {children}
       </main>
