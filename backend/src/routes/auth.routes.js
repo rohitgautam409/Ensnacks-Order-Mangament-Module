@@ -3,12 +3,12 @@
  */
 const express = require('express');
 const router = express.Router();
-const { 
-  clientSignup, 
-  clientLogin, 
-  adminSignup, 
-  adminLogin, 
-  getMe 
+const {
+  clientSignup,
+  clientLogin,
+  adminSignup,
+  adminLogin,
+  getMe
 } = require('../controllers/auth.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 

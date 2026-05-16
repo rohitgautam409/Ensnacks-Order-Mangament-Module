@@ -6,6 +6,7 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./src/config/db');
 const authRoutes = require('./src/routes/auth.routes');
+const productsRoute = require('./src/routes/Product.routes')
 const errorMiddleware = require('./src/middleware/error.middleware');
 
 const app = express();
@@ -20,16 +21,8 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoute)
 
-// Health check
-app.get('/health', (req, res) => {
-  res.status(200).json(
-    {
-      "status": "Okay",
-      "message": "Ensnacks API is running fine"
-    }
-  )
-});
 
 // Error handling middleware (must be last)
 app.use(errorMiddleware);
