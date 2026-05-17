@@ -5,10 +5,12 @@
 
 'use client'
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
+import Link from 'next/link'
 
 export default function ClientLayout({ children }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -39,25 +41,47 @@ export default function ClientLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <nav className="h-14 bg-[#2D6A4F] flex items-center justify-between px-6 shadow-md">
-        <div className="text-white font-bold text-lg">
-          🥜 Ensnacks
+      <nav className="h-14 bg-[#2D6A4F] flex items-center justify-between px-6 shadow-md relative z-50">
+        <div className="flex items-center gap-8">
+          <div className="text-white font-bold text-lg">
+            🥜 Ensnacks
+          </div>
+          
+          <div className="hidden md:flex items-center space-x-6 text-white text-sm">
+            <Link 
+              href="/products" 
+              className={`hover:text-green-200 transition ${pathname === '/products' ? 'underline font-semibold' : ''}`}
+            >
+              📦 Products
+            </Link>
+            <Link 
+              href="/orders" 
+              className={`hover:text-green-200 transition ${pathname === '/orders' ? 'underline font-semibold' : ''}`}
+            >
+              📋 My Orders
+            </Link>
+          </div>
         </div>
 
         <div className="flex items-center space-x-4">
-          <span className="text-white text-sm hidden sm:inline-block">
-            {user?.name || 'Client'} — {user?.companyName || 'Company'}
-          </span>
+          <div className="hidden sm:flex flex-col items-end mr-2">
+            <span className="text-white text-sm font-medium leading-tight">
+              {user?.name || 'Client'}
+            </span>
+            <span className="text-white/70 text-xs leading-tight">
+              {user?.companyName || 'Company'}
+            </span>
+          </div>
           <button
             onClick={handleLogout}
-            className="border border-white text-white hover:bg-white hover:text-[#2D6A4F] px-4 py-1 rounded-lg text-sm transition"
+            className="border border-white text-white hover:bg-white hover:text-[#2D6A4F] px-4 py-1 rounded-lg text-sm transition font-medium"
           >
             Logout
           </button>
         </div>
       </nav>
 
-      <main className="p-6 flex-1">
+      <main className="flex-1">
         {children}
       </main>
     </div>

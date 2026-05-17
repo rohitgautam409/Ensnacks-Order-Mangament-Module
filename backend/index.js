@@ -7,6 +7,7 @@ const cors = require('cors');
 const connectDB = require('./src/config/db');
 const authRoutes = require('./src/routes/auth.routes');
 const productsRoute = require('./src/routes/Product.routes')
+const orderRoutes = require('./src/routes/order.routes')
 const errorMiddleware = require('./src/middleware/error.middleware');
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoute)
+app.use('/api/orders', orderRoutes)
 
 
 // Error handling middleware (must be last)
