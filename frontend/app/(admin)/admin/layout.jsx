@@ -40,9 +40,9 @@ export default function AdminLayout({ children }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-300">
+    <div className="flex min-h-screen bg-gray-300 ">
       <Sidebar />
-      <main className=" flex-1">
+      <main className=" flex-1 ml-72 w-[calc(100%-18rem)] overflow-x-auto">
         {children}
       </main>
     </div>

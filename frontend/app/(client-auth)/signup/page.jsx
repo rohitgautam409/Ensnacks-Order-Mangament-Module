@@ -10,6 +10,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
+import Image from 'next/image'
+import companyImg from '@/assets/company-logo.png'
 
 export default function ClientSignup() {
   const router = useRouter()
@@ -83,11 +85,11 @@ export default function ClientSignup() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center p-4">
+    <div className="min-h-screen bg-gradient-to-b from-[#1A3A25] to-[#102819]  flex flex-col justify-center items-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8">
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-[#2D6A4F] rounded-full flex items-center justify-center text-3xl">
-            🥜
+          <div className="w-20 h-20 bg-[#F1E2D1] border-2 border-[#5A1E08] rounded-full flex items-center justify-center text-3xl">
+            <Image src={companyImg} alt="company-logo" width={50} height={50} />
           </div>
           <h1 className="text-2xl font-bold text-[#2D6A4F] mt-4">Ensnacks</h1>
           <p className="text-gray-500 text-sm mt-1">Join Ensnacks — Healthy snacks for your office</p>

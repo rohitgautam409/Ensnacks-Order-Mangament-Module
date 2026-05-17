@@ -9,6 +9,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import api from '@/lib/api'
+import Image from 'next/image'
+import companyImg from '@/assets/company-logo.png'
 
 export default function AdminRegister() {
   const router = useRouter()
@@ -53,7 +55,7 @@ export default function AdminRegister() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setErrors({})
-    
+
     const validationErrors = validate()
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors)
@@ -85,8 +87,8 @@ export default function AdminRegister() {
     <div className="min-h-screen bg-gradient-to-br from-[#1A3A25] to-[#0f2318] flex flex-col justify-center items-center p-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-[#2D6A4F] rounded-full flex items-center justify-center text-3xl">
-            🥜
+          <div className="w-20 h-20 bg-[#F1E2D1] border-2 border-[#5A1E08] rounded-full flex items-center justify-center text-3xl">
+            <Image src={companyImg} alt="company-logo" width={50} height={50} />
           </div>
           <h1 className="text-2xl font-bold text-[#2D6A4F] mt-4">Ensnacks</h1>
           <p className="text-xs uppercase tracking-widest text-gray-400 mt-1">Staff Registration</p>
